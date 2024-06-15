@@ -9,6 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   lint:
+    name: demo-lint
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -27,6 +28,7 @@ jobs:
         npm run lint
 
   test:
+    name: demo-test
     runs-on: ubuntu-latest
     defaults:
       run:
