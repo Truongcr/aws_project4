@@ -1,0 +1,66 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    branches:
+      - main
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lint:
+    name: Job-Lint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./starter/frontend
+    strategy:
+      matrix:
+        node-version: ["18.x"]
+    steps:
+      uses: actions/checkout@v4
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+      run: |
+        npm ci
+        npm run lint
+
+  test:
+    name: Job-Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./starter/frontend
+    strategy:
+      matrix:
+        node-version: ["18.x"]
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+    - name: Install, Run
+      run: |
+        npm ci
+        npm run test
+
+  build:
+    name: Build
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./starter/frontend
+    env:
+      REPOSITORY_FE: ${{ vars.ECR_REPOSITORY_FE }}
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v4
+    - name: Build image
+      run: docker build -t $REPOSITORY_FE --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 .
+#Re-TEST
