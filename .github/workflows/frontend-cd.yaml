@@ -1,6 +1,7 @@
 name: Frontend CD
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
@@ -100,3 +101,5 @@ jobs:
           cd ./starter/frontend/k8s
           kustomize edit set image frontend=${{ steps.login.outputs.registry }}/${{ vars.ECR_REPOSITORY_FE }}:${{ github.sha }}
           kustomize build | kubectl apply -f -
+
+#Test
