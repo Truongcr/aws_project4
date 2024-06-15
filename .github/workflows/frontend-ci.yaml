@@ -18,7 +18,7 @@ jobs:
         working-directory: ./starter/frontend
     strategy:
       matrix:
-        node-version: [18]
+        node-version: [16,17,18]
     steps:
     - name: checkout
       uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
         working-directory: ./starter/frontend
     strategy:
       matrix:
-        node-version: [18]
+        node-version: [16,17,18]
     steps:
     - name: checkout
       uses: actions/checkout@v4
