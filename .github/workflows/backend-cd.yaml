@@ -46,7 +46,7 @@ jobs:
         with:
           aws-access-key-id: ASIAQ4CMLOIJD5WQHEFY
           aws-secret-access-key: S+sDWkDr2A/0cbvfF9zQD9+ri2+a0M+5tYkhK5fV
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: us-east-1
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -70,7 +70,7 @@ jobs:
         with:
           aws-access-key-id: ASIAQ4CMLOIJD5WQHEFY
           aws-secret-access-key: S+sDWkDr2A/0cbvfF9zQD9+ri2+a0M+5tYkhK5fV
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: us-east-1
       - name: Update a kubeconfig file
         env:
           AWS_EKS_CLUSTER_NAME: ${{ vars.AWS_EKS_CLUSTER_NAME }}
