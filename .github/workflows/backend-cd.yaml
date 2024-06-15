@@ -44,8 +44,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ASIAQ4CMLOIJD5WQHEFY
+          aws-secret-access-key: S+sDWkDr2A/0cbvfF9zQD9+ri2+a0M+5tYkhK5fV
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Login to Amazon ECR
         id: login-ecr
@@ -68,8 +68,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ASIAQ4CMLOIJD5WQHEFY
+          aws-secret-access-key: S+sDWkDr2A/0cbvfF9zQD9+ri2+a0M+5tYkhK5fV
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Update a kubeconfig file
         env:
