@@ -98,11 +98,11 @@ jobs:
           aws-access-key-id: ${{ secrets.ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.TOKEN }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ secrets.REGION }}
       - name: Update a kubeconfig file
         run: |
           aws sts get-caller-identity
-          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name cluster
+          aws eks --region ${{ secrets.REGION }} update-kubeconfig --name cluster
           kubectl config current-context
       - name: Login to AmazonECR
         uses: aws-actions/amazon-ecr-login@v2
