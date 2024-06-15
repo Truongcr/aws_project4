@@ -80,13 +80,11 @@ jobs:
 
       - name: Update a kubeconfig file
         env:
-          EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
-          aws-region: ${{ secrets.REGION }}
+          EKS_CLUSTER_NAME: cluster
         run: |
           aws sts get-caller-identity
-          aws eks update-kubeconfig --region $aws-region --name $EKS_CLUSTER_NAME
+          aws eks --region ${{ secrets.REGION }} update-kubeconfig --name $EKS_CLUSTER_NAME
           kubectl config current-context
-          kubectl get svc
 
       - name: Login to Amazon ECR
         id: login-ecr-deploy
