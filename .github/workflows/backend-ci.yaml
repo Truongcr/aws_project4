@@ -22,14 +22,12 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Display version
-        run: python -c "import sys; print(sys.version)"
       - name: Install pipenv
         run: sudo pip install pipenv && sudo pip install flake8
-      - name: Install dependencies
-        run: pipenv install
-      - name: Running linter
-        run: pipenv run lint
+      - name: Install,run
+        run: |
+          pipenv install
+          pipenv run lint
 
   test:
     name: Test
@@ -53,11 +51,10 @@ jobs:
       - name: Install pipenv
         run: sudo pip install pipenv && sudo pip install flake8
 
-      - name: Install
-        run: pipenv install
-
-      - name: Run
-        run: pipenv run test
+      - name: Install, run
+        run: |
+          pipenv install
+          pipenv run test
 
   build:
     name: Build
@@ -70,6 +67,6 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: Build image
+      - name: Build
         run: docker build -t ${{ vars.ECR_REPOSITORY }} .
 # Test reBuild
