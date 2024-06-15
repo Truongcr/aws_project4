@@ -1,16 +1,9 @@
 name: Frontend CD
 
 on:
-  workflow_dispatch:
-  workflow_run:
-    workflows: [Python CD]
-    branches: [main]
-    types:
-      - completed
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  pull_request:
+    branches:
+      - main
 
 jobs:
   lint:
@@ -23,10 +16,9 @@ jobs:
       matrix:
         node-version: ["18.x"]
     steps:
-      #Checkout
       - uses: actions/checkout@v4
-      #Setup nodejs
-      - uses: actions/setup-node@v4
+      - name: setup
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
