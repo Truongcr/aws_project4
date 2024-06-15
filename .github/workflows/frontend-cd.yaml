@@ -1,0 +1,117 @@
+name: Frontend CD
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Python CD]
+    branches: [main]
+    types:
+      - completed
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./starter/frontend
+    strategy:
+      matrix:
+        node-version: ["16.x", "18.x", "20.x"]
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - run: |
+        npm ci
+        npm run lint
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./starter/frontend
+    strategy:
+      matrix:
+        node-version: ["16.x", "18.x", "20.x"]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: "./starter/frontend/package-lock.json"
+      - name: Install and run
+        run: npm ci
+        run: npm run test
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./starter/frontend
+    outputs:
+      repo-image-name: ${{ steps.build-push-image.outputs.repo-image-name }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.TOKEN }}
+          aws-region: ${{ secrets.REGION }}
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build, tag, push image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+          URL: http://localhost:5000
+        run: |
+          docker build -t $IMAGE_TAG --build-arg=REACT_APP_MOVIE_API_URL=$URL .
+          docker push $ECR_REGISTRY/$ECR_REGISTRY:$IMAGE_TAG
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: checkout 
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Update a kubeconfig file
+        run: |
+          aws sts get-caller-identity
+          aws eks --region ${{ secrets.AWS_REGION }} update-kubeconfig --name cluster
+          kubectl config current-context
+      - name: Login to AmazonECR
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Apply the manifest
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr-deploy.outputs.registry }}
+          ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd ./starter/frontend/k8s
+          kustomize edit set image frontend=$ECR_REGISTRY/${{ vars.ECR_REPOSITORY }}:$IMAGE_TAG
+          kustomize build | kubectl apply -f -
