@@ -82,6 +82,7 @@ jobs:
       - name: Update a kubeconfig file
         env:
           EKS_CLUSTER_NAME: ${{ vars.EKS_CLUSTER_NAME }}
+          aws-region: ${{ secrets.REGION }}
         run: |
           aws sts get-caller-identity
           aws eks update-kubeconfig --region $aws-region --name $EKS_CLUSTER_NAME
