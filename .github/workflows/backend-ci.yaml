@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - "./starter/backend/**"
+  workflow_dispatch:
 
 jobs:
   lint:
