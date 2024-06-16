@@ -9,6 +9,8 @@ CORS(app)
 app.register_blueprint(movies_api)
 
 # Start app
+# Re-test
+# Re-test 2
 if __name__ == "__main__":
     app.run(
         debug=True,
