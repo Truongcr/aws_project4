@@ -80,16 +80,18 @@ jobs:
           aws-region: ${{ secrets.REGION }}
 
       - name: Update kubeconfig file
+        end:
+          EKS_NAME: ${{vars.EKS_NAME}}
         run: |
           aws sts get-caller-identity
-          aws eks --region  ${{ secrets.REGION }} update-kubeconfig --name cluster
+          aws eks --region  ${{ secrets.REGION }} update-kubeconfig --name $EKS_NAME
           kubectl config current-context
 
       - name: Login to Amazon ECR
         id: login-ecr-deploy
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Apply the manifests to the cluster
+      - name: Apply the manifests to the ${{vars.EKS_NAME}}
         run: |
           cd ./starter/backend/k8s
           kustomize edit set image backend=${{ steps.login-ecr-deploy.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ github.sha }}
