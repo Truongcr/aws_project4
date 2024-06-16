@@ -72,8 +72,9 @@ jobs:
         env:
           REGISTRY: ${{ steps.login.outputs.registry }}
           REPOSITORY_FE: ${{ vars.ECR_REPOSITORY_FE }}
+          URL: ${{ vars.URL }}
         run: |
-          docker build -t $REGISTRY/$REPOSITORY_FE:${{ github.sha }} -t $REGISTRY/$REPOSITORY_FE:latest --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 .
+          docker build -t $REGISTRY/$REPOSITORY_FE:${{ github.sha }} -t $REGISTRY/$REPOSITORY_FE:latest --build-arg=REACT_APP_MOVIE_API_URL=$URL .
           docker push $REGISTRY/$REPOSITORY_FE:${{ github.sha }}
 
   deploy:
