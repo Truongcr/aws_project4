@@ -80,7 +80,7 @@ jobs:
           aws-region: ${{ secrets.REGION }}
 
       - name: Update kubeconfig file
-        end:
+        env:
           EKS_NAME: ${{vars.EKS_NAME}}
         run: |
           aws sts get-caller-identity
